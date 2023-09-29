@@ -69,16 +69,18 @@ app.post('/convert', upload.single('image'), (req, res) => {
     {
       logger: info => console.log(info),
       tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', // Restrict characters if needed
-      tessedit_char_blacklist: '`~!@#$%^&*()_=+[{}]\\|;:",<.>/?\'',// Specify the characters to be ignored
       psm: 7, // Try different page segmentation modes
     }
   ).then(({ data: { text } }) => {
-    console.log('Extracted Text:', text);
-    res.send(text);
+    // Perform post-processing to remove unwanted characters
+    const cleanedText = text.replace(/[`~!@#$%^&*()_=+\[\]{}\\|;:",<.>/?']/g, '');
+    console.log('Extracted Text:', cleanedText);
+    res.send(cleanedText);
   }).catch(error => {
     console.error('Error:', error);
     res.status(500).send('Error occurred during OCR.');
   });
+
 });
 
 app.listen(PORT, () => {
