@@ -4,31 +4,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to Text Converter</title>
+    <title>yyOCR</title>
+
+    <link rel="stylesheet" type="text/css" href="css/style_index.css">
 </head>
 
 <body>
+    <!-- Navbar -->
+    <nav>
+        <div class="navbar-content">
+            <a href="#">OCR</a>
+        </div>
+    </nav>
 
     <div class="media-container">
         <video id="video"></video>
         <canvas id="canvas"></canvas>
         <!-- <img id="photoPreview" src="" alt="Captured Photo"> -->
+        <!-- <img id="capturedImage" src="" alt="Captured Photo" class="captured-image"> -->
+
+        <!-- Bottom bar for buttons -->
+        <div class="bottom-bar">
+            <button type="button" onclick="switchCamera()">Switch Camera</button>
+            <button type="button" onclick="takePhoto()">Click photo</button>
+            <button type="button" onclick="retakePhoto()">Retake Photo</button>
+            <button id="convertButton">Convert</button>
+        </div>
+
+
+
     </div>
-    <button type="button" onclick="switchCamera()">Switch Camera</button>
+    <!-- <button type="button" onclick="switchCamera()">Switch Camera</button>
 
     <div class="click_btn">
         <button type="button" onclick="takePhoto()">Click photo</button>
 
         <button type="button" onclick="retakePhoto()">Retake Photo</button>
+    </div> -->
+
+
+
+    <!-- <input type="file" id="imageInput"> -->
+    <!-- <button id="convertButton">Convert</button> -->
+    <!-- <div id="output"></div> -->
+    <div id="ocr-dialog" class="dialog">
+        <div class="dialog-content">
+            <span class="close" onclick="closeDialog()">&times;</span>
+            <div id="output"></div>
+        </div>
     </div>
 
-
-    <h1>Image to Text Converter</h1>
-    <!-- <input type="file" id="imageInput"> -->
-    <button id="convertButton">Convert</button>
-    <div id="output"></div>
-
     <script>
+
+        // Function to open the dialog
+        function openDialog() {
+            const dialog = document.getElementById('ocr-dialog');
+            dialog.classList.add('active');
+        }
+
+        // Function to close the dialog
+        function closeDialog() {
+            const dialog = document.getElementById('ocr-dialog');
+            dialog.classList.remove('active');
+        }
+
         let stream;
 
         // Access the webcam and display the video feed
@@ -132,6 +171,9 @@
                 convertedText = await convertResponse.text();
                 outputDiv.textContent = convertedText;
                 console.log(convertedText);
+
+                openDialog();
+
             } else {
                 outputDiv.textContent = 'Error occurred while converting.';
             }
