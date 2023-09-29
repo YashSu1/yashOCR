@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Text Converter</title>
+</head>
+
+<body>
+
+    <div class="media-container">
+        <video id="video"></video>
+        <canvas id="canvas"></canvas>
+        <!-- <img id="photoPreview" src="" alt="Captured Photo"> -->
+    </div>
+    <button type="button" onclick="switchCamera()">Switch Camera</button>
+
+    <div class="click_btn">
+        <button type="button" onclick="takePhoto()">Click photo</button>
+
+        <button type="button" onclick="retakePhoto()">Retake Photo</button>
+    </div>
+
+
+    <h1>Image to Text Converter</h1>
+    <!-- <input type="file" id="imageInput"> -->
+    <button id="convertButton">Convert</button>
+    <div id="output"></div>
+
+    <script>
+        let stream;
+
+        // Access the webcam and display the video feed
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(str => {
+                stream = str; // Store the stream
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(err => {
+                console.error('Error accessing the webcam: ', err);
+            });
+        // Capture photo from the video feed
+        function takePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const imageWidth = video.videoWidth; // Use video dimensions for better quality
+            const imageHeight = video.videoHeight;
+
+            canvas.width = imageWidth;
+            canvas.height = imageHeight;
+
+            context.drawImage(video, 0, 0, imageWidth, imageHeight);
+
+            const imageDataURL = canvas.toDataURL('image/jpeg', 1.0); // High-quality JPEG
+
+            const formData = new FormData();
+            formData.append('photo', dataURLtoBlob(imageDataURL), 'captured.jpg');
+
+            fetch('/save-photo', {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                redirect: 'follow',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Photo saved successfully');
+                        const photoPreview = document.getElementById('photoPreview');
+                        photoPreview.src = imageDataURL; // Display the captured photo
+                        video.srcObject = null; // Stop the video feed
+                    } else {
+                        console.error('Error saving the photo');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving the photo: ', error);
+                    console.log('Error saving the photo: ', error);
+                });
+        }
+
+        function dataURLtoBlob(dataURL) {
+            const byteString = atob(dataURL.split(',')[1]);
+            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        // Retake photo by restarting the video feed
+        function retakePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            video.srcObject = stream; // Restart the video feed
+            video.play();
+        }
+
+        const convertButton = document.getElementById('convertButton');
+        const outputDiv = document.getElementById('output');
+
+
+        let convertedText = '';
+
+        convertButton.addEventListener('click', async () => {
+            outputDiv.textContent = 'Converting...';
+
+            // Load the image from a specific path
+            const imagePath = 'public/captured.jpg';
+
+            // Fetch the image content
+            const response = await fetch(imagePath);
+            const imageBlob = await response.blob();
+
+            const formData = new FormData();
+            formData.append('image', imageBlob, 'captured.jpg');
+
+            const convertResponse = await fetch('/convert', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (convertResponse.ok) {
+                convertedText = await convertResponse.text();
+                outputDiv.textContent = convertedText;
+                console.log(convertedText);
+            } else {
+                outputDiv.textContent = 'Error occurred while converting.';
+            }
+
+
+            const url = "https://script.google.com/macros/s/AKfycbzPm7TugrwHKNKefnvHhmPtadYDbCM4uzjx7TZPwa2ewfEixiTPwYXdI-vxVkdYv6oLEQ/exec"; // Replace with your Apps Script web app URL
+            const data = {
+                convertedText: convertedText, // Replace with your variable containing the ID
+            };
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                redirect: 'follow',
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    console.log("Data sent successfully:", response);
+                })
+                .catch(error => {
+                    console.error("Error sending data:", error);
+                });
+        });
+
+
+        // Switch camera
+        let currentFacingMode = 'user'; // 'user' for front camera, 'environment' for back camera
+
+        function switchCamera() {
+            const video = document.getElementById('video');
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop()); // Stop the current stream
+            }
+
+            currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentFacingMode } } })
+                .then(str => {
+                    stream = str;
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(err => {
+                    console.error('Error accessing the webcam: ', err);
+                });
+        }
+
+
+    </script>
+</body>
+
+</html>
+
+
+<!-- // Making changes manually_R1_R2_R3_R4_R5 -->
