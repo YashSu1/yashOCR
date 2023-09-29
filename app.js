@@ -1,6 +1,7 @@
 const express = require('express');
 const Tesseract = require('tesseract.js');
 const multer = require('multer');
+const Jimp = require('jimp'); // Import Jimp for image resizing
 const Webcam = require('node-webcam');
 const path = require('path');
 const fs = require('fs');
