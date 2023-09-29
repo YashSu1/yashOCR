@@ -68,6 +68,7 @@ app.post('/convert', upload.single('image'), (req, res) => {
     'eng',
     {
       logger: info => console.log(info),
+      psm: 7, // Try different page segmentation modes
     }
   ).then(({ data: { text } }) => {
     console.log('Extracted Text:', text);
