@@ -27,6 +27,95 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 
+// Add global variables for cropping
+let isCropping = false;
+let cropCanvas, cropContext;
+let cropX, cropY, cropWidth, cropHeight;
+
+// Function to start the cropping process
+function startCrop() {
+  isCropping = true;
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const overlay = document.getElementById('cropOverlay');
+  cropCanvas = document.getElementById('cropCanvas');
+  cropContext = cropCanvas.getContext('2d');
+
+  // Copy the captured image to the crop canvas
+  cropCanvas.width = canvas.width;
+  cropCanvas.height = canvas.height;
+  cropContext.drawImage(canvas, 0, 0);
+
+  // Show the cropping overlay
+  overlay.style.display = 'flex';
+
+  // Disable video streaming temporarily
+  video.pause();
+}
+
+// Function to complete cropping and replace the image
+function cropAndReplace() {
+  if (isCropping) {
+    isCropping = false;
+    const overlay = document.getElementById('cropOverlay');
+
+    // Hide the cropping overlay
+    overlay.style.display = 'none';
+
+    // Update the captured image with the cropped image
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+
+    // Clear the existing image
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the cropped image onto the canvas
+    context.drawImage(
+      cropCanvas,
+      cropX, cropY, cropWidth, cropHeight,
+      0, 0, canvas.width, canvas.height
+    );
+
+    // Resume video streaming
+    const video = document.getElementById('video');
+    video.play();
+  }
+}
+
+// Function to handle cropping area selection
+function handleCropArea(event) {
+  if (isCropping) {
+    const canvas = cropCanvas;
+    const rect = canvas.getBoundingClientRect();
+    cropX = (event.clientX - rect.left) * (canvas.width / rect.width);
+    cropY = (event.clientY - rect.top) * (canvas.height / rect.height);
+    cropWidth = 200; // Define your desired crop dimensions
+    cropHeight = 200; // Define your desired crop dimensions
+
+    // Clear the existing selection
+    cropContext.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw a rectangle for the cropping area
+    cropContext.strokeStyle = 'white';
+    cropContext.lineWidth = 2;
+    cropContext.strokeRect(cropX, cropY, cropWidth, cropHeight);
+  }
+}
+
+// Attach event listener for cropping area selection
+document.getElementById('cropCanvas').addEventListener('mousedown', handleCropArea);
+
+// Function to cancel cropping
+function cancelCrop() {
+  isCropping = false;
+  const overlay = document.getElementById('cropOverlay');
+  overlay.style.display = 'none';
+
+  // Resume video streaming
+  const video = document.getElementById('video');
+  video.play();
+}
+
 app.use(express.static('public'));
 
 
@@ -89,4 +178,6 @@ app.listen(PORT, () => {
 
 
 // Making changes manually_R1_R2_R3_R4
+
+// Add cropping function
 

@@ -5,6 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image to Text Converter</title>
+    <style>
+        /* Add styles for the cropping overlay */
+        .crop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .crop-overlay canvas {
+            max-width: 90%;
+            max-height: 90%;
+            border: 2px solid white;
+        }
+
+        .crop-overlay button {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -18,7 +44,7 @@
 
     <div class="click_btn">
         <button type="button" onclick="takePhoto()">Click photo</button>
-
+        <button type="button" onclick="startCrop()">Crop Image</button>
         <button type="button" onclick="retakePhoto()">Retake Photo</button>
     </div>
 
@@ -27,6 +53,12 @@
     <!-- <input type="file" id="imageInput"> -->
     <button id="convertButton">Convert</button>
     <div id="output"></div>
+    <!-- Add a cropping overlay with a canvas -->
+    <div id="cropOverlay" class="crop-overlay">
+        <canvas id="cropCanvas"></canvas>
+        <button type="button" onclick="cropAndReplace()">Done</button>
+        <button type="button" onclick="cancelCrop()">Cancel</button>
+    </div>
 
     <script>
         let stream;
@@ -189,3 +221,5 @@
 
 
 <!-- // Making changes manually_R1_R2_R3_R4_R5 -->
+
+<!-- // Add cropping function -->
