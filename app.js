@@ -68,7 +68,8 @@ app.post('/convert', upload.single('image'), (req, res) => {
     'eng',
     {
       logger: info => console.log(info),
-      psm: 13, // Try different page segmentation modes
+      tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', // Restrict characters if needed
+      psm: 7, // Try different page segmentation modes
     }
   ).then(({ data: { text } }) => {
     console.log('Extracted Text:', text);
