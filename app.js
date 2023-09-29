@@ -69,6 +69,7 @@ app.post('/convert', upload.single('image'), (req, res) => {
     {
       logger: info => console.log(info),
       tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', // Restrict characters if needed
+      tessedit_char_blacklist: '`~!@#$%^&*()_=+[{}]\|;:",<.>/?`', // Specify the characters to be ignored
       psm: 7, // Try different page segmentation modes
     }
   ).then(({ data: { text } }) => {
