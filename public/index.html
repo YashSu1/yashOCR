@@ -7,6 +7,9 @@
     <title>yyOCR</title>
 
     <link rel="stylesheet" type="text/css" href="css/style_index.css">
+    <!-- Include Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+
 </head>
 
 <body>
@@ -16,6 +19,11 @@
             <a href="#">OCR</a>
         </div>
     </nav>
+
+    <!-- Add a loading spinner -->
+    <div id="loading-spinner" class="spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+    </div>
 
     <div class="media-container">
         <video id="video"></video>
@@ -55,6 +63,17 @@
     </div>
 
     <script>
+        // Function to show the loading spinner
+        function showSpinner() {
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'block';
+        }
+
+        // Function to hide the loading spinner
+        function hideSpinner() {
+            const spinner = document.getElementById('loading-spinner');
+            spinner.style.display = 'none';
+        }
         // Define your sample text
         // const sampleText = `FM - Tested
         //                     M03Y23
@@ -161,6 +180,8 @@
 
         convertButton.addEventListener('click', async () => {
             outputDiv.textContent = 'Converting...';
+            showSpinner(); // Show the loading spinner
+
 
             // Load the image from a specific path
             const imagePath = 'public/captured.jpg';
@@ -187,6 +208,7 @@
             } else {
                 outputDiv.textContent = 'Error occurred while converting.';
             }
+            hideSpinner(); // Hide the loading spinner
 
 
             const url = "https://script.google.com/macros/s/AKfycbzPm7TugrwHKNKefnvHhmPtadYDbCM4uzjx7TZPwa2ewfEixiTPwYXdI-vxVkdYv6oLEQ/exec"; // Replace with your Apps Script web app URL
