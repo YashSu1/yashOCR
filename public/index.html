@@ -55,6 +55,11 @@
     </div>
 
     <script>
+        // Define your sample text
+        // const sampleText = `FM - Tested
+        //                     M03Y23
+        //                     242683 / 8`;
+
 
         // Function to open the dialog
         function openDialog() {
@@ -93,6 +98,11 @@
             canvas.height = imageHeight;
 
             context.drawImage(video, 0, 0, imageWidth, imageHeight);
+
+            // Draw the sample text on the canvas
+            // context.font = '20px Arial';
+            // context.fillStyle = 'white';
+            // context.fillText(sampleText, 20, 40); // Adjust the position as needed
 
             const imageDataURL = canvas.toDataURL('image/jpeg', 1.0); // High-quality JPEG
 
